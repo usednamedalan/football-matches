@@ -56,7 +56,7 @@ function getMatches(dateString) {
             }
         }
         
-        if (html == "") html = "No matches found for top leagues.";
+        if (html == "") html = "no matches";
         box.innerHTML = html;
     });
 }
@@ -69,7 +69,7 @@ function getEvents(id) {
         return;
     }
 
-    sBox.innerHTML = "Loading scorers...";
+    sBox.innerHTML = "scorers..";
     sBox.classList.add('active');
 
     fetch('https://v3.football.api-sports.io/fixtures/events?fixture=' + id, {
@@ -84,7 +84,7 @@ function getEvents(id) {
                 goalList += "Goal: " + ev[j].player.name + " (" + ev[j].time.elapsed + "') Assist: " + (ev[j].assist.name ?? "None") + "<br>";
             }
         }
-        if (goalList == "") goalList = "No goals.";
+        if (goalList == "") goalList = "no goal.";
         sBox.innerHTML = goalList;
     });
 }
