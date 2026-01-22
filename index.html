@@ -2,21 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Football Center</title>
+  <title>Football Stats</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
-  <!-- SIDEBAR (DESKTOP) -->
   <aside class="sidebar">
     <h2 class="logo">⚽ Football</h2>
+
+    <input type="text" id="teamSearch" placeholder="Search team..." />
+
     <nav>
       <button data-page="matches">Matches</button>
-      <button data-page="live">Live</button>
-      <button data-page="team">Team</button>
-      <button data-page="table">Table</button>
-      <button data-page="players">Players</button>
+      <button data-page="tables">Tables</button>
+      <button data-page="statistics">Statistics</button>
     </nav>
 
     <div class="theme-toggle">
@@ -25,21 +24,11 @@
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main id="app">
     <div id="loader" class="loader hidden"></div>
     <div id="error" class="error hidden"></div>
     <section id="content"></section>
   </main>
-
-  <!-- BOTTOM NAV (MOBILE) -->
-  <nav class="bottom-nav">
-    <button data-page="matches">🏟</button>
-    <button data-page="live">🔴</button>
-    <button data-page="team">👕</button>
-    <button data-page="table">📊</button>
-    <button data-page="players">⭐</button>
-  </nav>
 
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>
