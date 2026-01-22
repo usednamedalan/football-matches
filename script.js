@@ -1,107 +1,104 @@
-var key = '32a94097e144fbded05a2537984eb315';
-var d = new Date();
+const key = '32a94097e144fbded05a2537984eb315';
+const apiBase = 'https://v3.football.api-sports.io';
+const headers = { 'x-apisports-key': key };
 
 function U() {
-    var year = d.getFullYear();
-    var month = d.getMonth() + 1;
-    var day = d.getDate();
-
-    if (month < 10) month = '0' + month;
-    if (day < 10) day = '0' + day;
-
-    var str = year + '-' + month + '-' + day;
-    document.getElementById('dt').innerText = str;
-    
-    // Simple way to show if it's today
-    var now = new Date();
-    if (d.toDateString() == now.toDateString()) {
-        document.getElementById('day').innerText = "Today";
-    } else {
-        document.getElementById('day').innerText = "Match Day";
+    const dateInp = document.getElementById('dtInp').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateInp)) {
+        alert("Enter date as YYYY-MM-DD");
+        return;
     }
-    
-    G(str);
+    G(dateInp);
 }
 
-function B() {
-    d.setDate(d.getDate() - 1);
-    U();
-}
+function G(dateStr) {
+    const container = document.getElementById('m-box');
+    container.innerHTML = '<div class="loading">Fetching Matches...</div>';
 
-function F() {
-    d.setDate(d.getDate() + 1);
-    U();
-}
+    fetch(`${apiBase}/fixtures?date=${dateStr}`, { headers })
+        .then(r => r.json())
+        .then(res => {
+            const matches = res.response;
+            const topLeagues = [39, 140, 78, 135, 61, 2, 94, 88, 71, 253];
+            
+            const filtered = matches.filter(m => topLeagues.includes(m.league.id));
 
-function G(s) {
-    var div = document.getElementById('m-box');
-    div.innerHTML = "Loading...";
-
-    fetch('https://v3.football.api-sports.io/fixtures?date=' + s, {
-        headers: { 'x-apisports-key': key }
-    })
-    .then(r => r.json())
-    .then(res => {
-        var x = res.response;
-        var h = "";
-        var ids = [39, 140, 78, 135, 61, 2]; // top leagues
-
-        for (var i = 0; i < x.length; i++) {
-            var m = x[i];
-            if (ids.includes(m.league.id)) {
-                h += '<div class="box" onclick="E(' + m.fixture.id + ')">';
-                h += '<div class="row">';
-                h += '<div class="tm">' + m.teams.home.name + ' <img src="' + m.teams.home.logo + '"></div>';
-                h += '<div class="sc">' + m.goals.home + '-' + m.goals.away + '</div>';
-                h += '<div class="tm"><img src="' + m.teams.away.logo + '"> ' + m.teams.away.name + '</div>';
-                h += '</div>';
-                h += '<div class="ev" id="e' + m.fixture.id + '"></div>';
-                h += '</div>';
+            if (filtered.length === 0) {
+                container.innerHTML = ""; 
+                return;
             }
-        }
-        div.innerHTML = h || "No big games today.";
-    });
+
+            let html = "";
+            filtered.forEach(m => {
+                const status = m.fixture.status.short;
+                const isLive = ["1H", "HT", "2H", "ET", "P"].includes(status);
+                const scoreStyle = isLive ? 'style="color: #00d632;"' : '';
+
+                html += `
+                <div class="box" onclick="E(${m.fixture.id})">
+                    <div style="text-align:center; font-size:10px; color:#888; margin-bottom:5px;">
+                        ${m.league.name} • ${status}
+                    </div>
+                    <div class="row">
+                        <div class="tm home">${m.teams.home.name} <img src="${m.teams.home.logo}"></div>
+                        <div class="sc" ${scoreStyle}>
+                            ${m.goals.home ?? 0}:${m.goals.away ?? 0}
+                        </div>
+                        <div class="tm away"><img src="${m.teams.away.logo}"> ${m.teams.away.name}</div>
+                    </div>
+                    <div class="ev" id="e${m.fixture.id}"></div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        })
+        .catch(() => container.innerHTML = "Error loading data.");
 }
 
-function E(id) {
-    var eDiv = document.getElementById('e' + id);
-    if (eDiv.style.display == 'block') {
+function E(fixtureId) {
+    const eDiv = document.getElementById('e' + fixtureId);
+    
+    if (eDiv.style.display === 'block') {
         eDiv.style.display = 'none';
         return;
     }
 
-    eDiv.innerHTML = "Fetching events...";
+    eDiv.innerHTML = "Loading scores...";
     eDiv.style.display = 'block';
 
-    fetch('https://v3.football.api-sports.io/fixtures/events?fixture=' + id, {
-        headers: { 'x-apisports-key': key }
-    })
-    .then(r => r.json())
-    .then(res => {
-        var data = res.response;
-        var txt = "";
+    fetch(`${apiBase}/fixtures?id=${fixtureId}`, { headers })
+        .then(r => r.json())
+        .then(res => {
+            const fixtureData = res.response[0];
+            const homeId = fixtureData.teams.home.id;
 
-        if (!data || data.length === 0) {
-            eDiv.innerHTML = "No major events recorded.";
-            return;
-        }
+            fetch(`${apiBase}/fixtures/events?fixture=${fixtureId}`, { headers })
+                .then(r => r.json())
+                .then(eventRes => {
+                    const events = eventRes.response;
+                    let homeHTML = "";
+                    let awayHTML = "";
 
-        for (var i = 0; i < data.length; i++) {
-            var ev = data[i];
-            if (ev.type === "Goal") {
-                var time = ev.time.elapsed + (ev.time.extra ? '+' + ev.time.extra : "");
-                var scorer = ev.player.name || "Unknown Player";
-                var assist = ev.assist.name ? " (Assist: " + ev.assist.name + ")" : "";
-                var detail = ev.detail === "Own Goal" ? " [OG]" : "";
-                txt += `<strong>${time}'</strong> Goal: ${scorer}${detail}${assist}<br>`;
-            }
-        }
-        eDiv.innerHTML = txt || "No goals recorded yet.";
-    })
-    .catch(err => {
-        eDiv.innerHTML = "Error loading events.";
-        console.error(err);
-    });
+                    events.forEach(ev => {
+                        if (ev.type === "Goal") {
+                            const time = ev.time.elapsed + (ev.time.extra ? `+${ev.time.extra}` : "");
+                            const player = ev.player.name || "Unknown";
+                            const assist = ev.assist.name ? `<br><small style="color:#999">ast: ${ev.assist.name}</small>` : "";
+                            const og = ev.detail === "Own Goal" ? " <span style='color:red'>[OG]</span>" : "";
+                            
+                            const goalLine = `<div class="ev-item"><strong>${time}'</strong> ${player}${og}${assist}</div>`;
+                            if (ev.team.id === homeId) {
+                                homeHTML += goalLine;
+                            } else {
+                                awayHTML += goalLine;
+                            }
+                        }
+                    });
+
+                    eDiv.innerHTML = `
+                        <div class="ev-grid">
+                            <div class="ev-home">${homeHTML || "--"}</div>
+                            <div class="ev-away">${awayHTML || "--"}</div>
+                        </div>`;
+                });
+        });
 }
-
-U();
