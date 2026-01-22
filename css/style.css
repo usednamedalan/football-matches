@@ -1,0 +1,176 @@
+:root {
+  --bg: #0e1117;
+  --card: #161b22;
+  --text: #e6edf3;
+  --muted: #9ba3b4;
+  --accent: #3b82f6;
+  --live: #ef4444;
+}
+
+.light {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #2563eb;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: var(--card);
+  padding: 20px;
+  display: none;
+  flex-direction: column;
+}
+
+.sidebar .logo {
+  margin-bottom: 20px;
+}
+
+.sidebar nav button {
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.sidebar nav button:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.theme-toggle {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* MAIN */
+main {
+  flex: 1;
+  padding: 20px;
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--muted);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none;
+}
+
+.error {
+  background: #dc2626;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* MATCH CARD */
+.match {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.teams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.team img {
+  width: 28px;
+  height: 28px;
+}
+
+.score {
+  font-weight: bold;
+}
+
+.live {
+  color: var(--live);
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.5; }
+}
+
+/* TABLE */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 10px;
+  text-align: left;
+}
+
+.highlight {
+  background: rgba(59,130,246,0.2);
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.bottom-nav button {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 18px;
+}
+
+/* RESPONSIVE */
+@media (min-width: 900px) {
+  .sidebar {
+    display: flex;
+  }
+  .bottom-nav {
+    display: none;
+  }
+}
