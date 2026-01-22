@@ -1,96 +1,58 @@
 body {
-    background-color: #111;
+    background: #111;
     color: white;
-    font-family: Arial, sans-serif;
-    margin: 0;
-}
-
-.top-bar {
-    background-color: #222;
-    padding: 10px;
+    font-family: sans-serif;
     text-align: center;
-    border-bottom: 2px solid #00ff00;
 }
 
-.top-bar h1 {
-    color: #00ff00;
-    margin: 0;
+.H {
+    background: #222;
+    padding: 5px;
+    border-bottom: 3px solid #0f0;
 }
 
-.content {
-    width: 90%;
-    max-width: 700px;
-    margin: 20px auto;
+.H h1 { color: #0f0; }
+
+.C {
+    width: 400px;
+    margin: 0 auto;
 }
 
-.date-controls {
+.D {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
-    gap: 30px;
-    background: #1a1a1a;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    margin: 20px 0;
 }
 
-.btn {
-    padding: 10px 20px;
-    cursor: pointer;
-    background: #333;
-    color: white;
+.T h2, .T p { margin: 0; }
+
+.box {
+    background: #222;
     border: 1px solid #444;
+    margin: 10px 0;
+    padding: 10px;
     border-radius: 5px;
+    cursor: pointer;
 }
 
-.btn:hover {
-    background: #00ff00;
-    color: black;
-}
-
-#dayText {
-    margin: 0;
-}
-
-.match-box {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-}
-
-.main-row {
+.row {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.team {
-    width: 40%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+.tm img { width: 25px; vertical-align: middle; }
 
-.team img {
-    width: 30px;
-}
+.sc { font-weight: bold; font-size: 1.2em; }
 
-.score {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.scorers {
-    margin-top: 10px;
-    padding-top: 10px;
+.ev {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
     border-top: 1px solid #333;
-    font-size: 13px;
-    color: #aaa;
+    padding-top: 5px;
     display: none;
 }
 
-.active {
-    display: block;
-}
+.show { display: block; }
