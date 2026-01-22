@@ -15,29 +15,32 @@
   --accent: #2563eb;
 }
 
-* {
-  box-sizing: border-box;
-  font-family: system-ui, sans-serif;
-}
+* { box-sizing: border-box; font-family: system-ui, sans-serif; }
 
 body {
   margin: 0;
+  display: flex;
   background: var(--bg);
   color: var(--text);
-  display: flex;
 }
 
-/* SIDEBAR */
+/* Sidebar */
 .sidebar {
   width: 240px;
   background: var(--card);
   padding: 20px;
-  display: none;
+  display: flex;
   flex-direction: column;
 }
 
-.sidebar .logo {
+.sidebar .logo { margin-bottom: 20px; }
+
+.sidebar input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--muted);
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .sidebar nav button {
@@ -48,11 +51,10 @@ body {
   text-align: left;
   cursor: pointer;
   border-radius: 10px;
+  margin-bottom: 4px;
 }
 
-.sidebar nav button:hover {
-  background: rgba(255,255,255,0.05);
-}
+.sidebar nav button:hover { background: rgba(255,255,255,0.05); }
 
 .theme-toggle {
   margin-top: auto;
@@ -61,7 +63,7 @@ body {
   align-items: center;
 }
 
-/* MAIN */
+/* Main */
 main {
   flex: 1;
   padding: 20px;
@@ -77,13 +79,9 @@ main {
   margin: 40px auto;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 .error {
   background: #dc2626;
@@ -92,7 +90,7 @@ main {
   margin-bottom: 10px;
 }
 
-/* MATCH CARD */
+/* Match card */
 .match {
   background: var(--card);
   border-radius: 16px;
@@ -113,25 +111,15 @@ main {
   gap: 8px;
 }
 
-.team img {
-  width: 28px;
-  height: 28px;
-}
+.team img { width: 28px; height: 28px; }
 
-.score {
-  font-weight: bold;
-}
+.score { font-weight: bold; }
 
-.live {
-  color: var(--live);
-  animation: pulse 1.2s infinite;
-}
+.live { color: var(--live); animation: pulse 1.2s infinite; }
 
-@keyframes pulse {
-  50% { opacity: 0.5; }
-}
+@keyframes pulse { 50% { opacity: 0.5; } }
 
-/* TABLE */
+/* Table */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -146,31 +134,7 @@ main {
   background: rgba(59,130,246,0.2);
 }
 
-/* BOTTOM NAV */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--card);
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-}
-
-.bottom-nav button {
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 18px;
-}
-
-/* RESPONSIVE */
-@media (min-width: 900px) {
-  .sidebar {
-    display: flex;
-  }
-  .bottom-nav {
-    display: none;
-  }
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { width: 100%; flex-direction: row; padding: 10px; }
 }
