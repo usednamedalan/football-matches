@@ -3,266 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProScore Lite</title>
-    <style>
-        :root {
-            --bg: #0f1113;
-            --card: #1a1d21;
-            --text: #ffffff;
-            --text-dim: #9ca3af;
-            --accent: #00d632;
-            --border: #2d3139;
-            --sc-bg: #2d3139;
-        }
-
-        body {
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            padding-bottom: 50px;
-        }
-
-        #app {
-            width: 100%;
-            max-width: 550px;
-            padding: 15px;
-        }
-
-        /* Search Bar */
-        .search-box {
-            background: var(--card);
-            padding: 12px;
-            border-radius: 12px;
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
-        }
-
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 16px;
-            outline: none;
-        }
-
-        button {
-            background: var(--accent);
-            border: none;
-            color: black;
-            font-weight: bold;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* Match Card */
-        .match-card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            transition: background 0.2s;
-        }
-
-        .match-card:hover { background: #23272d; }
-
-        .league-label {
-            font-size: 11px;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .team {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .team.home { justify-content: flex-end; text-align: right; }
-        .team.away { justify-content: flex-start; text-align: left; }
-
-        .team img { width: 28px; height: 28px; }
-        .team.home img { margin-left: 12px; }
-        .team.away img { margin-right: 12px; }
-
-        .score-box {
-            min-width: 70px;
-            text-align: center;
-            background: var(--sc-bg);
-            padding: 6px 0;
-            border-radius: 6px;
-            margin: 0 15px;
-            font-size: 18px;
-            font-weight: 800;
-        }
-
-        .live-pulse {
-            color: var(--accent);
-            font-size: 11px;
-            display: block;
-            margin-top: 4px;
-        }
-
-        /* Events Section */
-        .events-panel {
-            display: none;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid var(--border);
-        }
-
-        .events-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .goal-item {
-            font-size: 12px;
-            margin-bottom: 6px;
-            color: var(--text-dim);
-        }
-
-        .goal-item strong { color: var(--text); }
-        .ev-home { text-align: right; border-right: 1px solid var(--border); padding-right: 10px; }
-        .ev-away { text-align: left; padding-left: 10px; }
-
-        .loading { text-align: center; color: var(--text-dim); padding: 40px; }
-    </style>
+    <title>ProScore | Live-Score Edition</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="app">
-    <div class="search-box">
-        <input type="text" id="dateInput" placeholder="YYYY-MM-DD" value="2026-01-22">
-        <button onclick="getMatches()">Search</button>
+    <div id="app">
+        <div class="search-box">
+            <input type="text" id="dateInput" placeholder="YYYY-MM-DD" value="2026-01-22">
+            <button onclick="getMatches()">Search</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px;">
+            <span style="font-size: 12px; color: var(--text-dim); font-weight: bold; text-transform: uppercase;">Matches</span>
+            <label style="font-size: 12px; color: var(--text-dim); display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" id="liveToggle" onchange="getMatches()" style="margin-right: 5px;"> Live Only
+            </label>
+        </div>
+
+        <div id="matches-container">
+            <div class="loading-text">Enter a date and click search to begin.</div>
+        </div>
     </div>
-    <div id="matches-container"></div>
-</div>
 
-<script>
-    const API_KEY = 'da384c1dbf880f63dd8e398cbb3d6471';
-    const TOP_LEAGUES = [39, 140, 78, 135, 61, 2, 94, 88, 71, 253];
-
-    async function getMatches() {
-        const date = document.getElementById('dateInput').value;
-        const container = document.getElementById('matches-container');
-        
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return alert("Use YYYY-MM-DD");
-
-        container.innerHTML = '<div class="loading">Fetching games...</div>';
-
-        try {
-            const response = await fetch(`https://v3.football.api-sports.io/fixtures?date=${date}`, {
-                headers: { 'x-apisports-key': API_KEY }
-            });
-            const data = await response.json();
-            const matches = data.response.filter(m => TOP_LEAGUES.includes(m.league.id));
-
-            if (matches.length === 0) {
-                container.innerHTML = '<div class="loading">No major matches found.</div>';
-                return;
-            }
-
-            container.innerHTML = matches.map(m => {
-                const isLive = ["1H", "HT", "2H", "ET", "P"].includes(m.fixture.status.short);
-                return `
-                <div class="match-card" onclick="toggleEvents(${m.fixture.id})">
-                    <div class="league-label">${m.league.name} • ${m.fixture.status.long}</div>
-                    <div class="row">
-                        <div class="team home">${m.teams.home.name} <img src="${m.teams.home.logo}"></div>
-                        <div class="score-box">
-                            <span style="${isLive ? 'color: var(--accent)' : ''}">
-                                ${m.goals.home ?? 0}:${m.goals.away ?? 0}
-                            </span>
-                            ${isLive ? `<span class="live-pulse">${m.fixture.status.elapsed}'</span>` : ''}
-                        </div>
-                        <div class="team away"><img src="${m.teams.away.logo}"> ${m.teams.away.name}</div>
-                    </div>
-                    <div class="events-panel" id="events-${m.fixture.id}"></div>
-                </div>`;
-            }).join('');
-
-        } catch (err) {
-            container.innerHTML = '<div class="loading">Error loading data.</div>';
-        }
-    }
-
-    async function toggleEvents(fixtureId) {
-        const panel = document.getElementById(`events-${fixtureId}`);
-        
-        if (panel.style.display === 'block') {
-            panel.style.display = 'none';
-            return;
-        }
-
-        panel.innerHTML = '<div style="text-align:center; font-size:12px;">Loading events...</div>';
-        panel.style.display = 'block';
-
-        try {
-            // Get fixture info to identify home team ID
-            const fRes = await fetch(`https://v3.football.api-sports.io/fixtures?id=${fixtureId}`, {
-                headers: { 'x-apisports-key': API_KEY }
-            });
-            const fData = await fRes.json();
-            const homeId = fData.response[0].teams.home.id;
-
-            // Get the specific goal events
-            const eRes = await fetch(`https://v3.football.api-sports.io/fixtures/events?fixture=${fixtureId}`, {
-                headers: { 'x-apisports-key': API_KEY }
-            });
-            const eData = await eRes.json();
-            
-            let homeHTML = "";
-            let awayHTML = "";
-
-            eData.response.forEach(ev => {
-                if (ev.type === "Goal") {
-                    const time = ev.time.elapsed + (ev.time.extra ? `+${ev.time.extra}` : "");
-                    const scorer = ev.player.name || "Unknown";
-                    const assist = ev.assist.name ? `<br><small>ast: ${ev.assist.name}</small>` : "";
-                    const og = ev.detail === "Own Goal" ? " <span style='color:#ff4d4d'>(OG)</span>" : "";
-                    
-                    const html = `<div class="goal-item"><strong>${time}'</strong> ${scorer}${og}${assist}</div>`;
-                    
-                    if (ev.team.id === homeId) homeHTML += html;
-                    else awayHTML += html;
-                }
-            });
-
-            panel.innerHTML = `
-                <div class="events-grid">
-                    <div class="ev-home">${homeHTML || "--"}</div>
-                    <div class="ev-away">${awayHTML || "--"}</div>
-                </div>`;
-
-        } catch (err) {
-            panel.innerHTML = "No goal details available.";
-        }
-    }
-
-    // Run on load
-    getMatches();
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
