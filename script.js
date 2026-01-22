@@ -1,92 +1,92 @@
-var myKey = '32a94097e144fbded05a2537984eb315';
-var myDate = new Date();
+var key = '32a94097e144fbded05a2537984eb315';
+var d = new Date();
 
-function update() {
-    var y = myDate.getFullYear();
-    var m = myDate.getMonth() + 1;
-    var d = myDate.getDate();
+function U() {
+    var year = d.getFullYear();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
 
-    if (m < 10) m = '0' + m;
-    if (d < 10) d = '0' + d;
+    if (month < 10) month = '0' + month;
+    if (day < 10) day = '0' + day;
 
-    var format = y + '-' + m + '-' + d;
-    document.getElementById('fullDate').innerHTML = format;
+    var str = year + '-' + month + '-' + day;
+    document.getElementById('dt').innerText = str;
     
-    getMatches(format);
+    // Simple way to show if it's today
+    var now = new Date();
+    if (d.toDateString() == now.toDateString()) {
+        document.getElementById('day').innerText = "Today";
+    } else {
+        document.getElementById('day').innerText = "Match Day";
+    }
+    
+    G(str);
 }
 
-function goBack() {
-    myDate.setDate(myDate.getDate() - 1);
-    document.getElementById('dayText').innerHTML = "Previous";
-    update();
+function B() {
+    d.setDate(d.getDate() - 1);
+    U();
 }
 
-function goForward() {
-    myDate.setDate(myDate.getDate() + 1);
-    document.getElementById('dayText').innerHTML = "Future";
-    update();
+function F() {
+    d.setDate(d.getDate() + 1);
+    U();
 }
 
-function getMatches(dateString) {
-    var box = document.getElementById('matches-container');
-    box.innerHTML = "Loading matches...";
+function G(s) {
+    var div = document.getElementById('m-box');
+    div.innerHTML = "Loading...";
 
-    fetch('https://v3.football.api-sports.io/fixtures?date=' + dateString, {
-        headers: { 'x-apisports-key': myKey }
+    fetch('https://v3.football.api-sports.io/fixtures?date=' + s, {
+        headers: { 'x-apisports-key': key }
     })
-    .then(res => res.json())
-    .then(data => {
-        var list = data.response;
-        var html = "";
+    .then(r => r.json())
+    .then(res => {
+        var x = res.response;
+        var h = "";
+        var ids = [39, 140, 78, 135, 61, 2]; // top leagues
 
-        var topLeagues = [39, 140, 78, 135, 61, 2];
-
-        for (var i = 0; i < list.length; i++) {
-            var m = list[i];
-            
-            if (topLeagues.includes(m.league.id)) {
-                html += '<div class="match-box" onclick="getEvents(' + m.fixture.id + ')">';
-                html += '<div class="main-row">';
-                html += '<div class="team" style="justify-content: flex-end">' + m.teams.home.name + ' <img src="' + m.teams.home.logo + '"></div>';
-                html += '<div class="score">' + (m.goals.home ?? 0) + ' - ' + (m.goals.away ?? 0) + '</div>';
-                html += '<div class="team"><img src="' + m.teams.away.logo + '"> ' + m.teams.away.name + '</div>';
-                html += '</div>';
-                html += '<div class="scorers" id="s-' + m.fixture.id + '"></div>';
-                html += '</div>';
+        for (var i = 0; i < x.length; i++) {
+            var m = x[i];
+            if (ids.includes(m.league.id)) {
+                h += '<div class="box" onclick="E(' + m.fixture.id + ')">';
+                h += '<div class="row">';
+                h += '<div class="tm">' + m.teams.home.name + ' <img src="' + m.teams.home.logo + '"></div>';
+                h += '<div class="sc">' + m.goals.home + '-' + m.goals.away + '</div>';
+                h += '<div class="tm"><img src="' + m.teams.away.logo + '"> ' + m.teams.away.name + '</div>';
+                h += '</div>';
+                h += '<div class="ev" id="e' + m.fixture.id + '"></div>';
+                h += '</div>';
             }
         }
-        
-        if (html == "") html = "no matches";
-        box.innerHTML = html;
+        div.innerHTML = h || "No big games today.";
     });
 }
 
-function getEvents(id) {
-    var sBox = document.getElementById('s-' + id);
-    
-    if (sBox.classList.contains('active')) {
-        sBox.classList.remove('active');
+function E(id) {
+    var eDiv = document.getElementById('e' + id);
+    if (eDiv.style.display == 'block') {
+        eDiv.style.display = 'none';
         return;
     }
 
-    sBox.innerHTML = "scorers..";
-    sBox.classList.add('active');
+    eDiv.innerHTML = "loading...";
+    eDiv.style.display = 'block';
 
     fetch('https://v3.football.api-sports.io/fixtures/events?fixture=' + id, {
-        headers: { 'x-apisports-key': myKey }
+        headers: { 'x-apisports-key': key }
     })
-    .then(res => res.json())
-    .then(data => {
-        var ev = data.response;
-        var goalList = "";
-        for (var j = 0; j < ev.length; j++) {
-            if (ev[j].type == "Goal") {
-                goalList += "Goal: " + ev[j].player.name + " (" + ev[j].time.elapsed + "') Assist: " + (ev[j].assist.name ?? "None") + "<br>";
+    .then(r => r.json())
+    .then(res => {
+        var data = res.response;
+        var txt = "";
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].type == "Goal") {
+                txt += data[i].time.elapsed + "' Goal: " + data[i].player.name + "<br>";
             }
         }
-        if (goalList == "") goalList = "no goal.";
-        sBox.innerHTML = goalList;
+        eDiv.innerHTML = txt || "No goals found.";
     });
 }
 
-update();
+U();
